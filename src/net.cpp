@@ -1144,6 +1144,7 @@ static const char *strDNSSeed[][2] = {
         {"104.157.238.43", "104.157.238.43"},
         
 };
+{
 void ThreadDNSAddressSeed(void* parg)
 {
     // Make this thread recognisable as the DNS seeding thread
