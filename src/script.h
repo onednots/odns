@@ -512,7 +512,7 @@ public:
         return nFound;
     }
 
-    // Pre-version-0.6, Icebergcoin always counted CHECKMULTISIGs
+
     // as 20 sigops. With pay-to-script-hash, that changed:
     // CHECKMULTISIGs serialized in scriptSigs are
     // counted more accurately, assuming they are of the form

@@ -24,11 +24,11 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(QWidget *parent) :
 
 #if (QT_VERSION >= 0x040700)
     /* Do not move this to the XML file, Qt before 4.7 will choke on it */
-    ui->addressIn_SM->setPlaceholderText(tr("Enter a Icebergcoin address (e.g. iUuWwFn7HKcHeARezeBp5fx8Yer18hyNEN)"));
+    ui->addressIn_SM->setPlaceholderText(tr("Enter a ODNS address (e.g. iUuWwFn7HKcHeARezeBp5fx8Yer18hyNEN)"));
     ui->signatureOut_SM->setPlaceholderText(tr("Click \"Sign Message\" to generate signature"));
 
-    ui->addressIn_VM->setPlaceholderText(tr("Enter a Icebergcoin address (e.g. iUuWwFn7HKcHeARezeBp5fx8Yer18hyNEN)"));
-    ui->signatureIn_VM->setPlaceholderText(tr("Enter Icebergcoin signature"));
+    ui->addressIn_VM->setPlaceholderText(tr("Enter a ODNS address (e.g. iUuWwFn7HKcHeARezeBp5fx8Yer18hyNEN)"));
+    ui->signatureIn_VM->setPlaceholderText(tr("Enter ODNS signature"));
 #endif
 
     GUIUtil::setupAddressWidget(ui->addressIn_SM, this);

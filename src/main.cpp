@@ -971,7 +971,12 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 
     if (pindexBest->nHeight == 1) { nSubsidy = 6000000 * COIN; }
     if (pindexBest->nHeight > 1) { nSubsidy = 0 * COIN; }
-    if (pindexBest->nHeight >= 5) { nSubsidy = 1 * COIN; }    
+    if (pindexBest->nHeight >= 5) { nSubsidy = 1 * COIN; }
+    if (pindexBest->nHeight >= 500) { nSubsidy = 5 * COIN; }
+    if (pindexBest->nHeight >= 1000) { nSubsidy = 10 * COIN; }
+    if (pindexBest->nHeight >= 2000) { nSubsidy = 30 * COIN; }
+    if (pindexBest->nHeight >= 3000) { nSubsidy = 40 * COIN; }
+    if (pindexBest->nHeight >= 4000) { nSubsidy = 50 * COIN; }   
     if (pindexBest->nHeight >= 5000) { nSubsidy = 100 * COIN; }
     if (pindexBest->nHeight >= 25000) { nSubsidy = 80 * COIN; }
     if (pindexBest->nHeight >= 125000) { nSubsidy = 50 * COIN; }
@@ -2055,7 +2060,7 @@ bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig) c
         if (!CheckCoinStakeTimestamp(GetBlockTime(), (int64_t)vtx[1].nTime))
             return DoS(50, error("CheckBlock() : coinstake timestamp violation nTimeBlock=%"PRId64" nTimeTx=%u", GetBlockTime(), vtx[1].nTime));
 
-        // IcebergCoin: check proof-of-stake block signature
+
         if (fCheckSig && !CheckBlockSignature())
             return DoS(100, error("CheckBlock() : bad proof-of-stake block signature"));
     }
