@@ -1148,7 +1148,7 @@ void ThreadDNSAddressSeed(void* parg)
 {
     // Make this thread recognisable as the DNS seeding thread
     RenameThread("Icebergcoin-dnsseed");
-};
+
     try
     {
         vnThreadsRunning[THREAD_DNSSEED]++;
