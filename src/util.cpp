@@ -1,7 +1,3 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2012 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "util.h"
 #include "sync.h"
@@ -9,11 +5,6 @@
 #include "version.h"
 #include "ui_interface.h"
 #include <boost/algorithm/string/join.hpp>
-
-// Work around clang compilation problem in Boost 1.46:
-// /usr/include/boost/program_options/detail/config_file.hpp:163:17: error: call to function 'to_internal' that is neither visible in the template definition nor found by argument-dependent lookup
-// See also: http://stackoverflow.com/questions/10020179/compilation-fail-in-boost-librairies-program-options
-//           http://clang.debian.net/status.php?version=3.0&key=CANNOT_FIND_FUNCTION
 namespace boost {
     namespace program_options {
         std::string to_internal(const std::string&);
@@ -1009,13 +1000,13 @@ void PrintExceptionContinue(std::exception* pex, const char* pszThread)
 boost::filesystem::path GetDefaultDataDir()
 {
     namespace fs = boost::filesystem;
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Icebergcoin
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Icebergcoin
-    // Mac: ~/Library/Application Support/Icebergcoin
-    // Unix: ~/.icebergcoin
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\odns
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\odns
+    // Mac: ~/Library/Application Support/odns
+    // Unix: ~/.odns
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Icebergcoin";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "odns";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -1027,10 +1018,10 @@ boost::filesystem::path GetDefaultDataDir()
     // Mac
     pathRet /= "Library/Application Support";
     fs::create_directory(pathRet);
-    return pathRet / "Icebergcoin";
+    return pathRet / "odns";
 #else
     // Unix
-    return pathRet / ".icebergcoin";
+    return pathRet / ".odns";
 #endif
 #endif
 }
