@@ -969,13 +969,8 @@ int64_t GetProofOfWorkReward(int64_t nFees)
     
     int64_t nSubsidy = 0 * COIN;
 
-    if (pindexBest->nHeight == 1) { nSubsidy = 6000000 * COIN; }
+    if (pindexBest->nHeight == 1) { nSubsidy = 12000000 * COIN; }
     if (pindexBest->nHeight > 1) { nSubsidy = 0 * COIN; }
-    if (pindexBest->nHeight >= 5) { nSubsidy = 1 * COIN; }
-    if (pindexBest->nHeight >= 500) { nSubsidy = 5 * COIN; }
-    if (pindexBest->nHeight >= 1000) { nSubsidy = 10 * COIN; }
-    if (pindexBest->nHeight >= 2000) { nSubsidy = 30 * COIN; }
-    if (pindexBest->nHeight >= 3000) { nSubsidy = 40 * COIN; }
     if (pindexBest->nHeight >= 4000) { nSubsidy = 50 * COIN; }   
     if (pindexBest->nHeight >= 5000) { nSubsidy = 100 * COIN; }
     if (pindexBest->nHeight >= 25000) { nSubsidy = 80 * COIN; }
@@ -2470,10 +2465,10 @@ bool LoadBlockIndex(bool fAllowNew)
 
     if (fTestNet)
     {
-        pchMessageStart[0] = 0xe7;
-        pchMessageStart[1] = 0xe3;
-        pchMessageStart[2] = 0xe2;
-        pchMessageStart[3] = 0xe1;
+        pchMessageStart[0] = 0xe6;
+        pchMessageStart[1] = 0xe6;
+        pchMessageStart[2] = 0xa5;
+        pchMessageStart[3] = 0xe3;
 
         bnProofOfWorkLimit = bnProofOfWorkLimitTestNet; // 0x0000ffff PoW base target is fixed in testnet
         nStakeMinAge = 20 * 60; // test net min age is 20 min
