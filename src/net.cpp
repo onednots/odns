@@ -1,8 +1,3 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2012 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #include "irc.h"
 #include "db.h"
 #include "net.h"
@@ -43,9 +38,6 @@ struct LocalServiceInfo {
     int nPort;
 };
 
-//
-// Global state variables
-//
 bool fClient = false;
 bool fDiscover = true;
 bool fUseUPnP = false;
@@ -89,7 +81,6 @@ unsigned short GetListenPort()
 
 void CNode::PushGetBlocks(CBlockIndex* pindexBegin, uint256 hashEnd)
 {
-    // Filter out duplicate requests
     if (pindexBegin == pindexLastGetBlocksBegin && hashEnd == hashLastGetBlocksEnd)
         return;
     pindexLastGetBlocksBegin = pindexBegin;
@@ -98,7 +89,6 @@ void CNode::PushGetBlocks(CBlockIndex* pindexBegin, uint256 hashEnd)
     PushMessage("getblocks", CBlockLocator(pindexBegin), hashEnd);
 }
 
-// find 'best' local address for a particular peer
 bool GetLocal(CService& addr, const CNetAddr *paddrPeer)
 {
     if (fNoListen)
@@ -122,8 +112,6 @@ bool GetLocal(CService& addr, const CNetAddr *paddrPeer)
     }
     return nBestScore >= 0;
 }
-
-// get best local address for a particular peer as a CAddress
 CAddress GetLocalAddress(const CNetAddr *paddrPeer)
 {
     CAddress ret(CService("0.0.0.0",0),0);
@@ -187,9 +175,6 @@ bool RecvLine(SOCKET hSocket, string& strLine)
         }
     }
 }
-
-// used when scores of local addresses may have changed
-// pushes better local address to peers
 void static AdvertizeLocal()
 {
     LOCK(cs_vNodes);
@@ -250,7 +235,6 @@ bool AddLocal(const CNetAddr &addr, int nScore)
     return AddLocal(CService(addr, GetListenPort()), nScore);
 }
 
-/** Make a particular network entirely off-limits (no automatic connects to it) */
 void SetLimited(enum Network net, bool fLimited)
 {
     if (net == NET_UNROUTABLE)
@@ -269,8 +253,6 @@ bool IsLimited(const CNetAddr &addr)
 {
     return IsLimited(addr.GetNetwork());
 }
-
-/** vote for a local address */
 bool SeenLocal(const CService& addr)
 {
     {
@@ -284,15 +266,11 @@ bool SeenLocal(const CService& addr)
 
     return true;
 }
-
-/** check whether a given address is potentially local */
 bool IsLocal(const CService& addr)
 {
     LOCK(cs_mapLocalHost);
     return mapLocalHost.count(addr) > 0;
 }
-
-/** check whether a given address is in a network we can probably connect to */
 bool IsReachable(const CNetAddr& addr)
 {
     LOCK(cs_mapLocalHost);
@@ -356,10 +334,6 @@ bool GetMyExternalIP(CNetAddr& ipRet)
     for (int nLookup = 0; nLookup <= 1; nLookup++)
     for (int nHost = 1; nHost <= 2; nHost++)
     {
-        // We should be phasing out our use of sites like these.  If we need
-        // replacements, we should ask for volunteers to put this simple
-        // php file on their web server that prints the client IP:
-        //  <?php echo $_SERVER["REMOTE_ADDR"]; ?>
         if (nHost == 1)
         {
             addrConnect = CService("91.198.22.70",80); // checkip.dyndns.org
@@ -418,22 +392,10 @@ void ThreadGetMyExternalIP(void* parg)
         AddLocal(addrLocalHost, LOCAL_HTTP);
     }
 }
-
-
-
-
-
 void AddressCurrentlyConnected(const CService& addr)
 {
     addrman.Connected(addr);
 }
-
-
-
-
-
-
-
 CNode* FindNode(const CNetAddr& ip)
 {
     {
@@ -479,23 +441,17 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest)
             return pnode;
         }
     }
-
-
-    /// debug print
     printf("trying connection %s lastseen=%.1fhrs\n",
         pszDest ? pszDest : addrConnect.ToString().c_str(),
         pszDest ? 0 : (double)(GetAdjustedTime() - addrConnect.nTime)/3600.0);
 
-    // Connect
     SOCKET hSocket;
     if (pszDest ? ConnectSocketByName(addrConnect, hSocket, pszDest, GetDefaultPort()) : ConnectSocket(addrConnect, hSocket))
     {
         addrman.Attempt(addrConnect);
 
-        /// debug print
         printf("connected %s\n", pszDest ? pszDest : addrConnect.ToString().c_str());
 
-        // Set to non-blocking
 #ifdef WIN32
         u_long nOne = 1;
         if (ioctlsocket(hSocket, FIONBIO, &nOne) == SOCKET_ERROR)
@@ -505,7 +461,6 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest)
             printf("ConnectSocket() : fcntl non-blocking setting failed, error %d\n", errno);
 #endif
 
-        // Add node
         CNode* pnode = new CNode(hSocket, addrConnect, pszDest ? pszDest : "", false);
         pnode->AddRef();
 
@@ -542,7 +497,6 @@ void CNode::Cleanup()
 
 void CNode::PushVersion()
 {
-    /// when NTP implemented, change to just nTime = GetAdjustedTime()
     int64_t nTime = (fInbound ? GetAdjustedTime() : GetTime());
     CAddress addrYou = (addr.IsRoutable() && !IsProxy(addr) ? addr : CAddress(CService("0.0.0.0",0)));
     CAddress addrMe = GetLocalAddress(&addr);
@@ -633,7 +587,6 @@ void CNode::copyStats(CNodeStats &stats)
 
 void ThreadSocketHandler(void* parg)
 {
-    // Make this thread recognisable as the networking thread
     RenameThread("Icebergcoin-net");
 
     try
@@ -660,9 +613,7 @@ void ThreadSocketHandler2(void* parg)
 
     while (true)
     {
-        //
-        // Disconnect nodes
-        //
+   
         {
             LOCK(cs_vNodes);
             // Disconnect unused nodes
@@ -672,17 +623,10 @@ void ThreadSocketHandler2(void* parg)
                 if (pnode->fDisconnect ||
                     (pnode->GetRefCount() <= 0 && pnode->vRecv.empty() && pnode->vSend.empty()))
                 {
-                    // remove from vNodes
                     vNodes.erase(remove(vNodes.begin(), vNodes.end(), pnode), vNodes.end());
-
-                    // release outbound grant (if any)
                     pnode->grantOutbound.Release();
-
-                    // close socket and cleanup
                     pnode->CloseSocketDisconnect();
                     pnode->Cleanup();
-
-                    // hold in disconnected pool until all refs are released
                     if (pnode->fNetworkNode || pnode->fInbound)
                         pnode->Release();
                     vNodesDisconnected.push_back(pnode);
@@ -727,11 +671,6 @@ void ThreadSocketHandler2(void* parg)
             nPrevNodeCount = vNodes.size();
             uiInterface.NotifyNumConnectionsChanged(vNodes.size());
         }
-
-
-        //
-        // Find which sockets have data to receive
-        //
         struct timeval timeout;
         timeout.tv_sec  = 0;
         timeout.tv_usec = 50000; // frequency to poll pnode->vSend
@@ -787,11 +726,6 @@ void ThreadSocketHandler2(void* parg)
             FD_ZERO(&fdsetError);
             MilliSleep(timeout.tv_usec/1000);
         }
-
-
-        //
-        // Accept new connections
-        //
         BOOST_FOREACH(SOCKET hListenSocket, vhListenSocket)
         if (hListenSocket != INVALID_SOCKET && FD_ISSET(hListenSocket, &fdsetRecv))
         {
@@ -842,11 +776,6 @@ void ThreadSocketHandler2(void* parg)
                 }
             }
         }
-
-
-        //
-        // Service each socket
-        //
         vector<CNode*> vNodesCopy;
         {
             LOCK(cs_vNodes);
@@ -858,10 +787,6 @@ void ThreadSocketHandler2(void* parg)
         {
             if (fShutdown)
                 return;
-
-            //
-            // Receive
-            //
             if (pnode->hSocket == INVALID_SOCKET)
                 continue;
             if (FD_ISSET(pnode->hSocket, &fdsetRecv) || FD_ISSET(pnode->hSocket, &fdsetError))
@@ -909,9 +834,6 @@ void ThreadSocketHandler2(void* parg)
                 }
             }
 
-            //
-            // Send
-            //
             if (pnode->hSocket == INVALID_SOCKET)
                 continue;
             if (FD_ISSET(pnode->hSocket, &fdsetSend))
@@ -942,9 +864,6 @@ void ThreadSocketHandler2(void* parg)
                 }
             }
 
-            //
-            // Inactivity checking
-            //
             if (pnode->vSend.empty())
                 pnode->nLastSendEmpty = GetTime();
             if (GetTime() - pnode->nTimeConnected > 60)
@@ -975,14 +894,6 @@ void ThreadSocketHandler2(void* parg)
         MilliSleep(10);
     }
 }
-
-
-
-
-
-
-
-
 
 #ifdef USE_UPNP
 void ThreadMapPort(void* parg)
@@ -1126,18 +1037,6 @@ void MapPort()
 }
 #endif
 
-
-
-
-
-
-
-
-
-// DNS seeds
-// Each pair gives a source name and a seed name.
-// The first name is used as information source for addrman.
-// The second name should resolve to a list of seed addresses.
 static const char *strDNSSeed[][2] = {
         {"35.184.73.253", "35.184.73.253"}
            
